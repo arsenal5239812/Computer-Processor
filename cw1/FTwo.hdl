@@ -1,0 +1,14 @@
+/**
+ * Circuit for FTwo chip:
+ * If f0=0, f1=1 then F=A∨C, G=B∨D
+ */
+ 
+CHIP FTwo {
+
+	IN A, B, C, D;
+	OUT F, G;
+	
+	PARTS:
+	Or (a = A, b = C, out = F);
+	Or (a = B, b = D, out = G);
+}

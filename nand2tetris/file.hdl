@@ -1,0 +1,9 @@
+CHIP file {
+	IN a, b, c;
+	OUT f;
+	
+	PARTS:
+		Not (in=c, out=Notc);
+		And (a=a, b=Notc, out=aandNotc);
+		Or(a=b, b=aandNotc, out=f);
+}

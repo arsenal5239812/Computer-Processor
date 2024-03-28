@@ -1,0 +1,55 @@
+/**
+ * Circuit for FThree chip:
+ * If f0=0, f1=0 then
+ * 			     E=(A∧C)∨(A∧B∧D)∨(B∧C∧D)
+ * 		 	     F=(A∧B∧C∧D)∨(¬A∧B∧¬C∨D)∨(A∧¬C∧¬D)∨(A∧¬B∧¬C)∨(¬A∧C∧¬D)∨(¬A∧¬B∧C), 
+ * 			     G=B⊕D,
+ */
+ 
+CHIP FThree {
+
+	IN A, B, C, D;
+	OUT E, F, G;
+	
+	PARTS:
+	// Not gates
+	Not (in = A, out = notA);
+	Not (in = B, out = notB);
+	Not (in = C, out = notC);
+	Not (in = D, out = notD);
+	
+	//And gates
+	And (a = A, b = C, out = AC);
+	And (a = A, b = B, out = AB);
+	And (a = AB, b = D, out = ABD);
+	And (a = B, b = C, out = BC);
+	And (a = BC, b = D, out = BCD);
+	And (a = C, b = D, out = CD);
+	And (a = AB, b = CD, out = ABCD);
+	And (a = notA, b = B, out = nAB);
+	And (a = notC, b = D, out = nCD);
+	And (a = nAB, b = nCD, out = nABnCD);
+	And (a = A, b = notC, out = AnC);
+	And (a = AnC, b = notD, out = AnCnD);
+	And (a = A, b = notB, out = AnB);
+	And (a = AnB, b = notC, out = AnBnC);
+	And (a = notA, b = C, out = nAC);
+	And (a = nAC, b = notD, out = nACnD);
+	And (a = notA, b = notB, out = nAnB);
+	And (a = nAnB, b = C, out = nAnBC);
+	
+	// E output
+	Or (a = AC, b = ABD, out = Etemp);
+	Or (a = Etemp, b = BCD,  out = E);
+	
+	// F output
+	Or (a = ABCD, b = nABnCD, out = Ftemp0);
+	Or (a = AnCnD, b = AnBnC, out = Ftemp1);
+	Or (a = nACnD, b = nAnBC, out = Ftemp2);
+	Or (a = Ftemp0, b = Ftemp1, out = Ftemp3);
+	Or (a = Ftemp2, b = Ftemp3, out = F);
+	
+	// G output
+	Xor (a = B, b = D, out = G);
+	
+}

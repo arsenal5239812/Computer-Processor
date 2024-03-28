@@ -1,0 +1,24 @@
+/**
+ * Circuit for FSEQ chip
+ */
+ 
+CHIP FSEQ {
+
+    IN f1, f0, A, B, C, D, load;
+    OUT E, F, G;
+
+	PARTS:
+	// Reference FALL chip
+    FALL(A = A, B = B, C = nextC, D = nextD, f1 = f1, f0 = f0, E = Etemp, F = Ftemp, G = Gtemp);
+	
+	// Store outputs after DFF to avoid using ouputs as inputs for the next clock cycle
+	DFF(in = Etemp, out = E);
+	DFF(in = Ftemp, out = storedC, out = F);
+	DFF(in = Gtemp, out = storedD, out = G);
+
+	// If load = 0, sets Ct+1 = Ft and Dt+1 = Gt
+	// If load = 1, load new inputs to Ct and Dt
+	Mux(a = storedC, b = C, sel = load, out = nextC);
+	Mux(a = storedD, b = D, sel = load, out = nextD);
+	
+}

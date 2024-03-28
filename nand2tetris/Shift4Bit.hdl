@@ -1,0 +1,10 @@
+CHIP Shift4Bit {
+	IN Din;
+	OUT out[4];
+	
+	PARTS:
+	DFF(in=Din, out=diff1, out= out[0]);
+	DFF(in=diff1, out=diff2, out= out[1]);
+	DFF(in=diff2, out=diff3, out= out[2]);
+	DFF(in=diff3, out=diff4, out= out[3]);
+}

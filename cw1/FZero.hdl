@@ -1,0 +1,14 @@
+/**
+ * Circuit for FZero chip:
+ * If f0=1, f1=1 then F=¬C, G=¬D
+ */
+ 
+CHIP FZero {
+
+	IN A, B, C, D;
+	OUT F, G;
+	
+	PARTS:
+	Not (in = C, out = F);
+	Not (in = D, out = G);
+}

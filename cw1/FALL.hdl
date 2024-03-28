@@ -1,0 +1,73 @@
+/**
+ * Circuit for FALL chip
+ */
+
+CHIP FALL {
+
+	IN f1, f0, A, B, C, D;
+	OUT E, F, G;
+	
+	PARTS:
+	// Not gates
+	Not (in = A, out = notA);
+	Not (in = B, out = notB);
+	Not (in = C, out = notC);
+	Not (in = D, out = notD);
+	
+	// And gates
+	And (a = A, b = B, out = AB);
+	And (a = A, b = C, out = AC);
+	And (a = B, b = C, out = BC);
+	And (a = B, b = D, out = BD);
+	And (a = notA, b = notB, out = nAnB);
+	And (a = notA, b = C, out = nAC);
+	And (a = A, b = notC, out = AnC);
+	And (a = A, b = notB, out = AnB);
+	And (a = notA, b = B, out = nAB);
+	And (a = notC, b = D, out = nCD);
+	And (a = AB, b = D, out = ABD);
+	And (a = BC, b = D, out = BCD);
+	And (a = nAnB, b = C, out = nAnBC);
+	And (a = nAC, b = notD, out = nACnD);
+	And (a = AnC, b = notD, out = AnCnD);
+	And (a = AnB, b = notC, out = AnBnC);
+	And (a = nAB, b = nCD, out = nABnCD);
+	And (a = AC, b = BD, out = ABCD);
+	
+	// Or gates
+	Or (a = A, b = C, out = AoC);
+	Or (a = B, b = D, out = BoD);
+	
+	// Control logic for (f1, f0)
+	Mux(a = true, b = false, sel = f0, out = f0Eq0); 
+    Mux(a = false, b = true, sel = f0, out = f0Eq1);
+	Mux(a = true, b = false, sel = f1, out = f1Eq0); 
+    Mux(a = false, b = true, sel = f1, out = f1Eq1);
+	And(a = f1Eq1, b = f0Eq1, out = mod11); // (f1, f0)==(1, 1)
+    And(a = f1Eq1, b = f0Eq0, out = mod10); // (f1, f0)==(1, 0)
+    And(a = f1Eq0, b = f0Eq1, out = mod01); // (f1, f0)==(0, 1)
+	And(a = f1Eq0, b = f0Eq0, out = mod00); // (f1, f0)==(0, 0)
+	
+	// E output only for (f1, f0) = (0, 0)
+    Or (a = AC, b = ABD, out = ACoABD);
+    Or (a = ACoABD, b = BCD, out = Etemp);  
+    And(a = Etemp, b = f0Eq0, out = E0); 
+	And(a = E0, b = f1Eq0, out = E);
+	
+	// F output
+	Or (a = nAnBC, b = nACnD, out = F0);
+	Or (a = F0, b = AnCnD, out = F1);
+	Or (a = F1, b = AnBnC, out = F2);
+	Or (a = F2, b = nABnCD, out = F3);
+	Or (a = F3, b = ABCD, out = Ftemp);
+	Mux (a = notC, b = AC, sel = mod10, out = Ftemp1);
+	Mux (a = Ftemp1, b =AoC, sel = mod01, out = Ftemp2);
+	Mux (a = Ftemp2, b = Ftemp, sel = mod00, out = F);
+	
+	// G output
+	Xor (a = B, b = D, out = BXorD);
+	Mux (a = notD, b = BD, sel = mod10, out = Gtemp1);
+	Mux (a = Gtemp1, b = BoD, sel = mod01, out = Gtemp2);
+	Mux (a = Gtemp2, b = BXorD, sel = mod00, out = G);
+
+}
